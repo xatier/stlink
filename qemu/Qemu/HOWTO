@@ -1,0 +1,6 @@
+		./configure --python=/path/to/python --target-list=arm-softmmu
+		./src/arm-softmmu/qemu-system-arm -M stm32l152rbt6 -nographic -chardev socket,id=led_green,port=4242,host=localhost,nodelay -chardev socket,id=led_blue,port=4243,host=localhost,nodelay -chardev socket,id=user0,port=4244,host=localhost,nodelay -kernel /path/to/emulated/program
+	
+		-M stm32l152rbt6
+		- chardev xxx
+		-kernel xxx

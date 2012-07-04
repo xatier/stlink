@@ -1,0 +1,174 @@
+
+blinky.none-eabi:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+08000000 <myvectors>:
+ 8000000:	00 20 00 20 21 00 00 08 11 00 00 08 13 00 00 08     . . !...........
+
+08000010 <nmi_handler>:
+}
+
+void nmi_handler(void)
+{
+    return ;
+}
+ 8000010:	4770      	bx	lr
+
+08000012 <hardfault_handler>:
+
+void hardfault_handler(void)
+{
+    return ;
+}
+ 8000012:	4770      	bx	lr
+
+08000014 <delay>:
+}
+
+void delay(void) 
+{
+	int i = 100;													/* About 1/4 second delay */
+	while (i-- > 0) {
+ 8000014:	2365      	movs	r3, #101	; 0x65
+ 8000016:	e000      	b.n	800001a <delay+0x6>
+		asm("nop");													/* This stops it optimising code out */
+ 8000018:	bf00      	nop
+}
+
+void delay(void) 
+{
+	int i = 100;													/* About 1/4 second delay */
+	while (i-- > 0) {
+ 800001a:	3b01      	subs	r3, #1
+ 800001c:	d1fc      	bne.n	8000018 <delay+0x4>
+		asm("nop");													/* This stops it optimising code out */
+	}
+}
+ 800001e:	4770      	bx	lr
+
+Disassembly of section .text.startup:
+
+08000020 <main>:
+
+int main(void){	
+	int n = 0;
+	int button;
+
+	RCC->APB2ENR |= 0x10 | 0x04;									/* Enable the GPIOA (bit 2) and GPIOC (bit 8) */
+ 8000020:	4b13      	ldr	r3, [pc, #76]	; (8000070 <main+0x50>)
+    (unsigned int *)	nmi_handler,       
+    (unsigned int *)	hardfault_handler  
+};
+
+
+int main(void){	
+ 8000022:	b510      	push	{r4, lr}
+	int n = 0;
+	int button;
+
+	RCC->APB2ENR |= 0x10 | 0x04;									/* Enable the GPIOA (bit 2) and GPIOC (bit 8) */
+ 8000024:	699a      	ldr	r2, [r3, #24]
+	GPIOC->CRH = 0x11;												/* Set GPIOC Pin 8 and Pin 9 to outputs */
+ 8000026:	4913      	ldr	r1, [pc, #76]	; (8000074 <main+0x54>)
+
+int main(void){	
+	int n = 0;
+	int button;
+
+	RCC->APB2ENR |= 0x10 | 0x04;									/* Enable the GPIOA (bit 2) and GPIOC (bit 8) */
+ 8000028:	f042 0414 	orr.w	r4, r2, #20
+ 800002c:	619c      	str	r4, [r3, #24]
+	GPIOC->CRH = 0x11;												/* Set GPIOC Pin 8 and Pin 9 to outputs */
+	GPIOA->CRL = 0x04;												/* Set GPIOA Pin 0 to input floating */
+ 800002e:	4b12      	ldr	r3, [pc, #72]	; (8000078 <main+0x58>)
+int main(void){	
+	int n = 0;
+	int button;
+
+	RCC->APB2ENR |= 0x10 | 0x04;									/* Enable the GPIOA (bit 2) and GPIOC (bit 8) */
+	GPIOC->CRH = 0x11;												/* Set GPIOC Pin 8 and Pin 9 to outputs */
+ 8000030:	2011      	movs	r0, #17
+	GPIOA->CRL = 0x04;												/* Set GPIOA Pin 0 to input floating */
+ 8000032:	2204      	movs	r2, #4
+int main(void){	
+	int n = 0;
+	int button;
+
+	RCC->APB2ENR |= 0x10 | 0x04;									/* Enable the GPIOA (bit 2) and GPIOC (bit 8) */
+	GPIOC->CRH = 0x11;												/* Set GPIOC Pin 8 and Pin 9 to outputs */
+ 8000034:	6048      	str	r0, [r1, #4]
+    (unsigned int *)	hardfault_handler  
+};
+
+
+int main(void){	
+	int n = 0;
+ 8000036:	2400      	movs	r4, #0
+	int button;
+
+	RCC->APB2ENR |= 0x10 | 0x04;									/* Enable the GPIOA (bit 2) and GPIOC (bit 8) */
+	GPIOC->CRH = 0x11;												/* Set GPIOC Pin 8 and Pin 9 to outputs */
+	GPIOA->CRL = 0x04;												/* Set GPIOA Pin 0 to input floating */
+ 8000038:	601a      	str	r2, [r3, #0]
+
+    while(1)
+    {
+		delay();													/* A short delay */
+ 800003a:	f7ff ffeb 	bl	8000014 <delay>
+		button = ((GPIOA->IDR & 0x1) == 0);							/* Read the button - the button pulls down PA0 to logic 0 */
+		n++;														/* Count the delays */
+ 800003e:	3401      	adds	r4, #1
+		if (n & 1) {												/* Copy bit 0 of counter into GPIOC:Pin 8 */
+ 8000040:	f014 0f01 	tst.w	r4, #1
+	GPIOA->CRL = 0x04;												/* Set GPIOA Pin 0 to input floating */
+
+    while(1)
+    {
+		delay();													/* A short delay */
+		button = ((GPIOA->IDR & 0x1) == 0);							/* Read the button - the button pulls down PA0 to logic 0 */
+ 8000044:	4b0c      	ldr	r3, [pc, #48]	; (8000078 <main+0x58>)
+ 8000046:	490b      	ldr	r1, [pc, #44]	; (8000074 <main+0x54>)
+		n++;														/* Count the delays */
+		if (n & 1) {												/* Copy bit 0 of counter into GPIOC:Pin 8 */
+			GPIOC->BSRR = 1<<8 ; 
+ 8000048:	bf14      	ite	ne
+ 800004a:	f44f 7080 	movne.w	r0, #256	; 0x100
+		} else { 
+			GPIOC->BSRR = 1<<24;	
+ 800004e:	f04f 7080 	moveq.w	r0, #16777216	; 0x1000000
+		}
+		if ((n & 4) && button) {									/* Copy bit 4 of counter into GPIOC:Pin 9 if button pressed */
+ 8000052:	f014 0f04 	tst.w	r4, #4
+	GPIOA->CRL = 0x04;												/* Set GPIOA Pin 0 to input floating */
+
+    while(1)
+    {
+		delay();													/* A short delay */
+		button = ((GPIOA->IDR & 0x1) == 0);							/* Read the button - the button pulls down PA0 to logic 0 */
+ 8000056:	689a      	ldr	r2, [r3, #8]
+		n++;														/* Count the delays */
+		if (n & 1) {												/* Copy bit 0 of counter into GPIOC:Pin 8 */
+			GPIOC->BSRR = 1<<8 ; 
+		} else { 
+			GPIOC->BSRR = 1<<24;	
+ 8000058:	6108      	str	r0, [r1, #16]
+ 800005a:	4b06      	ldr	r3, [pc, #24]	; (8000074 <main+0x54>)
+		}
+		if ((n & 4) && button) {									/* Copy bit 4 of counter into GPIOC:Pin 9 if button pressed */
+ 800005c:	d004      	beq.n	8000068 <main+0x48>
+ 800005e:	07d2      	lsls	r2, r2, #31
+ 8000060:	d402      	bmi.n	8000068 <main+0x48>
+			GPIOC->BSRR = 1<<9 ; 
+ 8000062:	f44f 7200 	mov.w	r2, #512	; 0x200
+ 8000066:	e000      	b.n	800006a <main+0x4a>
+		} else { 
+			GPIOC->BSRR = 1<<33;	
+ 8000068:	2200      	movs	r2, #0
+ 800006a:	611a      	str	r2, [r3, #16]
+ 800006c:	e7e5      	b.n	800003a <main+0x1a>
+ 800006e:	bf00      	nop
+ 8000070:	40021000 	.word	0x40021000
+ 8000074:	40011000 	.word	0x40011000
+ 8000078:	40010800 	.word	0x40010800
