@@ -125,14 +125,17 @@ static int stm32l_sys_init(uint32_t base, qemu_irq irq,
 
 static void stm32l152rbt6_init(ram_addr_t ram_size, const char *boot_device, const char *kernel_filename, const char *kernel_cmdline, const char *initrd_filename, const char *cpu_model) {
     //Préparation de la mémoire
+    //Preparation of the memory
     MemoryRegion *address_space_mem = get_system_memory();
     uint16_t flash_size = stm32_board.f_size; //128KBits
     uint16_t sram_size = 0x0010; //16 KBits
     
     
     //Initialisation du processeur (+ mémoire)
+    //Initialisation of processor  (+ memory)
     qemu_irq* pic = armv7m_init(address_space_mem, flash_size, sram_size, kernel_filename, cpu_model);
     stm32l_sys_init(0x1FF00000, pic[28], &stm32_board); //FIXME: Vérifier l'implémentation de la sys memory
+                                                        //       Verity the implememtation of the system memory
     
     
     //Structures GPIO
@@ -148,9 +151,11 @@ static void stm32l152rbt6_init(ram_addr_t ram_size, const char *boot_device, con
     DeviceState* gpio_dev[NB_GPIO];    
     
     //Création du bouton
+    //Creation of the botton
     DeviceState* button = sysbus_create_simple("stm32_button", -1, NULL);
     
     //Création des leds
+    //Creation of  leds
     DeviceState* led_dev6 = sysbus_create_simple("stm32_led_blue", -1, NULL);
     DeviceState* led_dev7 = sysbus_create_simple("stm32_led_green", -1, NULL);
     

@@ -48,6 +48,7 @@ static int stm32_button_init(SysBusDevice *dev, const char* id) {
     stm32_button_state *s = FROM_SYSBUS(stm32_button_state, dev);
     
     //Initialisation de la pin de sortie
+    //Initialisation of the output pin
     qdev_init_gpio_out(&dev->qdev, &s->gpio_out, 1);
     
     //Initialisation du Chardev

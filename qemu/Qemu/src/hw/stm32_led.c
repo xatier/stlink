@@ -27,6 +27,7 @@ static void stm32_led_reset(stm32_led_state *s) {
  * Appelé quand une entrée de led reçoit une IT
  */
 static void stm32_led_recvirq(void * opaque, int numPin, int level) {
+    // the LED change state
     printf("La LED change d'état->%d\n", level);
     stm32_led_state *s = (stm32_led_state *) opaque;
     

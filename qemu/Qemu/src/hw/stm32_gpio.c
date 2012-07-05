@@ -63,7 +63,9 @@ static void stm32_gpio_update(stm32_gpio_state *s) {
             uint32_t modeMask = (1 << (i*2)) | (1 << ((i*2) + 1));
             if((s->mode & modeMask) != 0) {
                 //Envoie une IRQ vers le periphérique branché sur la pin du GPIO
+                //send an IRQ to the device connected to the GPIO pin
                 //FIXME: La transmition vers la pin est directe alors qu'elle devrait se produire lors du prochain tick de la RCC
+                //the transmition to the pin is direct when it should occur at the next tick of the RCC
                 qemu_set_irq(s->irq_out[i], (s->outd & mask) != 0);
             }
         }
@@ -191,6 +193,7 @@ static void stm32_gpio_reset(stm32_gpio_state *s) {
 
 /*
  * Appelé quand une entrée de GPIO reçois une IT
+ * called when an input GPIO receive an IT
  */
 static void stm32_gpio_in_recv(void * opaque, int numPin, int level) {
     assert(numPin>=0 && numPin<NB_PIN);
@@ -199,15 +202,18 @@ static void stm32_gpio_in_recv(void * opaque, int numPin, int level) {
     
     uint32_t mask = (1 << (numPin*2)) | (1 << ((numPin*2) + 1));
     //Test si la pin est configurée en input
+    //check if the pin is confihured as input
     //--Pull-up Pull-Down -> Doit être différent de 00
+    //                       must be different trom 00
     if((s->pupd & mask) == 0) {return;} 
     //--Mode register -> 00
     if((s->mode & mask) != 0) {return;} 
     
     //Ecriture dans le registre input data register
+    //Writing to the register input data register
     printf("GPIO_in[%d]->%d\n", numPin, level);
     if(level) {
-        s->ind |= (1 << numPin); //Mise à 1
+        s->ind |= (1 << numPin); //Mise à 1     mise => last
     } else {
         s->ind &= ~(1 << numPin); //Mise à 0
     }
@@ -233,6 +239,7 @@ static int stm32_gpio_init(SysBusDevice *dev, const unsigned char id) {
     s->id = id;
     
     //Initialisation de la plage mémoire
+    //Initialisation of the memory range
     iomemtype = cpu_register_io_memory(stm32_gpio_readfn, stm32_gpio_writefn, s, DEVICE_NATIVE_ENDIAN);
     sysbus_init_mmio(dev, 0x24, iomemtype);
     
