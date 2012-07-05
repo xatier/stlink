@@ -227,7 +227,6 @@ class Ctrl:
         print sys.path
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serversocket.bind((socket.gethostname(), int(entryPort.get())))
-        #serversocket.bind(("localhost", int(entryPort.get())))
         serversocket.listen(1) 
         print serversocket
         if name == "green" :
