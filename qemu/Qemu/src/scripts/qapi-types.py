@@ -135,14 +135,14 @@ struct %(name)s
     return ret
 
 def generate_type_cleanup_decl(name):
-    ret = mcgen('''
+    return mcgen('''
 void qapi_free_%(type)s(%(c_type)s obj);
 ''',
-                c_type=c_type(name),type=name)
-    return ret
+                    c_type=c_type(name),type=name)
 
 def generate_type_cleanup(name):
-    ret = mcgen('''
+    return mcgen(
+        '''
 void qapi_free_%(type)s(%(c_type)s obj)
 {
     QapiDeallocVisitor *md;
@@ -158,8 +158,9 @@ void qapi_free_%(type)s(%(c_type)s obj)
     qapi_dealloc_visitor_cleanup(md);
 }
 ''',
-                c_type=c_type(name),type=name)
-    return ret
+        c_type=c_type(name),
+        type=name,
+    )
 
 
 try:

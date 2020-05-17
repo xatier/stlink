@@ -160,10 +160,7 @@ class HMPShell(QMPShell):
                     # Command in the form 'foobar|f' or 'f|foobar', take the
                     # full name
                     opt = name.split('|')
-                    if len(opt[0]) == 1:
-                        name = opt[1]
-                    else:
-                        name = opt[0]
+                    name = opt[1] if len(opt[0]) == 1 else opt[0]
                 self._completer.append(name)
                 self._completer.append('help ' + name) # help completion
 

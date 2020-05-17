@@ -177,10 +177,7 @@ class StdVectorPrinter:
                 if self.item == self.finish and self.so >= self.fo:
                     raise StopIteration
                 elt = self.item.dereference()
-                if elt & (1 << self.so):
-                    obit = 1
-                else:
-                    obit = 0
+                obit = 1 if elt & 1 << self.so else 0
                 self.so = self.so + 1
                 if self.so >= self.isize:
                     self.item = self.item + 1
@@ -462,7 +459,7 @@ class StdBitsetPrinter:
         # size.  Or we could use a regexp on the type.
         return '%s' % (self.typename)
 
-    def children (self):
+    def children(self):
         words = self.val['_M_w']
         wtype = words.type
 
@@ -477,17 +474,15 @@ class StdBitsetPrinter:
 
         nwords = wtype.sizeof / tsize
         result = []
-        byte = 0
-        while byte < nwords:
+        for byte in range(nwords):
             w = words[byte]
             bit = 0
             while w != 0:
                 if (w & 1) != 0:
                     # Another spot where we could use 'set'?
                     result.append(('[%d]' % (byte * tsize * 8 + bit), 1))
-                bit = bit + 1
+                bit += 1
                 w = w >> 1
-            byte = byte + 1
         return result
 
 class StdDequePrinter:
@@ -528,10 +523,7 @@ class StdDequePrinter:
         self.val = val
         self.elttype = val.type.template_argument(0)
         size = self.elttype.sizeof
-        if size < 512:
-            self.buffer_size = int (512 / size)
-        else:
-            self.buffer_size = 1
+        self.buffer_size = int(512 / size) if size < 512 else 1
 
     def to_string(self):
         start = self.val['_M_impl']['_M_start']
@@ -655,10 +647,9 @@ class Tr1UnorderedMapPrinter:
         return '%s with %d elements' % (self.typename, self.val['_M_element_count'])
 
     @staticmethod
-    def flatten (list):
+    def flatten(list):
         for elt in list:
-            for i in elt:
-                yield i
+            yield from elt
 
     @staticmethod
     def format_one (elt):
@@ -678,15 +669,15 @@ class Tr1UnorderedMapPrinter:
     def display_hint (self):
         return 'map'
 
-def register_libstdcxx_printers (obj):
+def register_libstdcxx_printers(obj):
     "Register libstdc++ pretty-printers with objfile Obj."
 
-    if obj == None:
+    if obj is None:
         obj = gdb
 
     obj.pretty_printers.append (lookup_function)
 
-def lookup_function (val):
+def lookup_function(val):
     "Look-up and return a pretty-printer that can print val."
 
     # Get the type.
@@ -701,7 +692,7 @@ def lookup_function (val):
 
     # Get the type name.    
     typename = type.tag
-    if typename == None:
+    if typename is None:
         return None
 
     # Iterate over local dictionary of types to determine
@@ -710,7 +701,7 @@ def lookup_function (val):
     for function in pretty_printers_dict:
         if function.search (typename):
             return pretty_printers_dict[function] (val)
-        
+
     # Cannot find a pretty printer.  Return None.
     return None
 

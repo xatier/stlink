@@ -52,7 +52,7 @@ if gdb.current_objfile () is not None:
     objfile = gdb.current_objfile ().filename
     dir_ = os.path.join (os.path.dirname (objfile), dotdots, pythondir)
 
-    if not dir_ in sys.path:
+    if dir_ not in sys.path:
         sys.path.insert(0, dir_)
 
 # Load the pretty-printers.

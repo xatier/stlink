@@ -104,7 +104,7 @@ def readserial(infile, logfile, byteadjust):
                 out += "<00>\n"
                 isnewline = 1
                 continue
-            if oc == 0x0a:
+            elif oc == 0x0A:
                 out += "\n"
                 isnewline = 1
                 continue
