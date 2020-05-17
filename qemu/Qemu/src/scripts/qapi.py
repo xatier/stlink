@@ -70,9 +70,9 @@ def parse_schema(fp):
         if line.startswith('#') or line == '\n':
             continue
 
-        if line.startswith(' '):
+        if line.startswith(' ') or not (line.startswith(' ') or expr):
             expr += line
-        elif expr:
+        else:
             expr_eval = evaluate(expr)
             if expr_eval.has_key('enum'):
                 add_enum(expr_eval['enum'])
@@ -80,9 +80,6 @@ def parse_schema(fp):
                 add_enum('%sKind' % expr_eval['union'])
             exprs.append(expr_eval)
             expr = line
-        else:
-            expr += line
-
     if expr:
         expr_eval = evaluate(expr)
         if expr_eval.has_key('enum'):
@@ -99,7 +96,7 @@ def parse_args(typeinfo):
         argentry = typeinfo[member]
         optional = False
         structured = False
-        if member.startswith('*'):
+        if argname.startswith('*'):
             argname = member[1:]
             optional = True
         if isinstance(argentry, OrderedDict):
@@ -111,10 +108,7 @@ def de_camel_case(name):
     for ch in name:
         if ch.isupper() and new_name:
             new_name += '_'
-        if ch == '-':
-            new_name += '_'
-        else:
-            new_name += ch.lower()
+        new_name += '_' if ch == '-' else ch.lower()
     return new_name
 
 def camel_case(name):
@@ -164,7 +158,7 @@ def c_type(name):
         return '%s *' % c_list_type(name[0])
     elif is_enum(name):
         return name
-    elif name == None or len(name) == 0:
+    elif name is None or len(name) == 0:
         return 'void'
     elif name == name.upper():
         return '%sEvent *' % camel_case(name)
@@ -173,7 +167,7 @@ def c_type(name):
 
 def genindent(count):
     ret = ""
-    for i in range(count):
+    for _ in range(count):
         ret += " "
     return ret
 

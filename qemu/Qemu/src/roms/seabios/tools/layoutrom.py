@@ -387,10 +387,7 @@ def findInit(sections):
     for section in sections:
         if section.category is not None:
             continue
-        if section.fileid == '32flat':
-            section.category = '32init'
-        else:
-            section.category = section.fileid
+        section.category = '32init' if section.fileid == '32flat' else section.fileid
 
 
 ######################################################################
@@ -481,11 +478,11 @@ def parseObjDump(file, fileid):
     state = None
     for line in file.readlines():
         line = line.rstrip()
-        if line == 'Sections:':
-            state = 'section'
-            continue
         if line == 'SYMBOL TABLE:':
             state = 'symbol'
+            continue
+        elif line == 'Sections:':
+            state = 'section'
             continue
         if line.startswith('RELOCATION RECORDS FOR ['):
             sectionname = line[24:-2]
@@ -497,34 +494,6 @@ def parseObjDump(file, fileid):
             relocsection = sectionmap[sectionname]
             continue
 
-        if state == 'section':
-            try:
-                idx, name, size, vma, lma, fileoff, align = line.split()
-                if align[:3] != '2**':
-                    continue
-                section = Section()
-                section.name = name
-                section.size = int(size, 16)
-                section.align = 2**int(align[3:])
-                section.fileid = fileid
-                section.relocs = []
-                sections.append(section)
-                sectionmap[name] = section
-            except ValueError:
-                pass
-            continue
-        if state == 'symbol':
-            try:
-                sectionname, size, name = line[17:].split()
-                symbol = Symbol()
-                symbol.size = int(size, 16)
-                symbol.offset = int(line[:8], 16)
-                symbol.name = name
-                symbol.section = sectionmap.get(sectionname)
-                symbols[name] = symbol
-            except ValueError:
-                pass
-            continue
         if state == 'reloc':
             try:
                 off, type, symbolname = line.split()
@@ -545,6 +514,34 @@ def parseObjDump(file, fileid):
                 relocsection.relocs.append(reloc)
             except ValueError:
                 pass
+        elif state == 'section':
+            try:
+                idx, name, size, vma, lma, fileoff, align = line.split()
+                if align[:3] != '2**':
+                    continue
+                section = Section()
+                section.name = name
+                section.size = int(size, 16)
+                section.align = 2**int(align[3:])
+                section.fileid = fileid
+                section.relocs = []
+                sections.append(section)
+                sectionmap[name] = section
+            except ValueError:
+                pass
+            continue
+        elif state == 'symbol':
+            try:
+                sectionname, size, name = line[17:].split()
+                symbol = Symbol()
+                symbol.size = int(size, 16)
+                symbol.offset = int(line[:8], 16)
+                symbol.name = name
+                symbol.section = sectionmap.get(sectionname)
+                symbols[name] = symbol
+            except ValueError:
+                pass
+            continue
     return sections, symbols
 
 def main():

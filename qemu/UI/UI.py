@@ -185,16 +185,18 @@ class Ctrl:
             self.ui.log.insert(Tkinter.END,"Disconnected \n")
             
     def user_pressed(self):
-        if self.connBouton != None :
-            self.connBouton.send(struct.pack('B',1))
-        else :
+        if self.connBouton is None:
             self.ui.log.insert(Tkinter.END,"User button not connected\n")
+
+        else:
+            self.connBouton.send(struct.pack('B',1))
             
     def user_released(self):
-        if self.connBouton != None :
-            self.connBouton.send(struct.pack('B',0))
-        else :
+        if self.connBouton is None:
             self.ui.log.insert(Tkinter.END,"User button not connected")
+
+        else:
+            self.connBouton.send(struct.pack('B',0))
         
     def traiterrecv(self,conn):
         while 1:

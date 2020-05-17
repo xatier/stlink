@@ -159,7 +159,7 @@ filters = {
 }
 
 def invert(d):
-    return dict((x[1], x[0]) for x in d.iteritems())
+    return {x[1]: x[0] for x in d.iteritems()}
 
 for f in filters:
     filters[f] = (filters[f][0], invert(filters[f][1]))

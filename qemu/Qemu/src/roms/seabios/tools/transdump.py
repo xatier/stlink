@@ -38,10 +38,7 @@ def main():
     if len(sys.argv) != 2:
         printUsage()
     filename = sys.argv[1]
-    if filename == '-':
-        filehdl = sys.stdin
-    else:
-        filehdl = open(filename, 'r')
+    filehdl = sys.stdin if filename == '-' else open(filename, 'r')
     mem = parseMem(filehdl)
     for i in mem:
         sys.stdout.write(struct.pack("<I", i))
